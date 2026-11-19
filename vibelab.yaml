@@ -1,0 +1,38 @@
+app:
+  id: "7709628844977831976"
+  name: "烟花之夜"
+  slogan: "城堡与月光下的烟花盛典,双手一捏,点亮整片夜空。"
+  description: |-
+    《烟花之夜》是一款基于 PICO 空间计算平台打造的沉浸式烟花体验应用。
+
+    夜幕降临,一座城堡静立在温柔月色之中。轻点"点火",烟花便会从城堡上空腾空而起,在夜空中绽放出层层叠叠的光与色。
+
+    体积窗口模式下,整座城堡与烟花秀被缩小到桌面尺度,如同一座会发光的音乐盒,静静立在你的房间里;进入沉浸模式后,场景按真实建筑比例放大,城堡、月亮与烟花以本来的尺度环绕在你四周——伸出双手,连续捏合两次即可点燃烟花,同样的手势也能带你退出沉浸、回到现实房间。
+
+    每一场烟花秀的开场,天空中都会先燃起文字造型的烟花,随后转为色彩斑斓的随机绽放,配合专属音效与自然月光的暖色氛围,让每一次点燃都独一无二。
+
+    城堡、月光、烟花与你的空间——欢迎来到属于自己的烟花之夜。
+  tags:
+    - "影音娱乐"
+  category: "application"
+  icon: "assets/icon.jpg"
+  landscape: "assets/landscape.jpg"
+  detail_images:
+    - "assets/detail-1.png"
+    - "assets/detail-2.png"
+    - "assets/detail-3.png"
+    - "assets/detail-4.png"
+  videos: []
+version:
+  name: "V1.0.0"
+  notes: |-
+    首个版本上线：一座悬浮城堡与温柔月色，搭配随手可点燃的烟花秀。体积窗口模式下，烟花在桌面尺度的城堡上空绽放；沉浸模式下，场景放大到真实建筑尺度，伸出双手，连续两次捏合即可点火，退出时同样只需一个手势。开场烟花会在夜空中拼出文字，随后转入绚丽多变的随机烟花，配合定制音效与自然月光氛围，带来一场专属于你空间的烟花盛典。（已升级 PICO Spatial SDK 至 6.2.8）
+build:
+  repo_url: "https://github.com/illusion-openlab/SpaceFireworks"
+  repo_visibility: "public"
+  tech_stack: "android_spatial"
+  ai_tool: "Claude Code"
+  ai_model: "claude-opus-4-6"
+  features:
+    - "hand_tracking"
+  teammates: []

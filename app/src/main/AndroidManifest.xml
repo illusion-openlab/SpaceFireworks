@@ -2,6 +2,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
+    <uses-permission android:name="com.picovr.permission.HAND_TRACKING" />
+
     <application
         android:name=".platform.SpatialApplication"
         android:dataExtractionRules="@xml/data_extraction_rules"
@@ -122,6 +124,9 @@
              and it discards even Logger.e, which is how a failed openStage or a gesture-layer
              platform-gate rejection ends up leaving nothing in logcat at all. -->
         <meta-data android:name="pico.spatial.ui.Logger" android:value="1" />
+
+        <!-- Declares hand tracking support (used by the immersive Stage's double-pinch gestures). -->
+        <meta-data android:name="handtracking" android:value="1" />
 
         <meta-data android:name="icon.3d.list" android:resource="@array/icon_3d_list" />
         <meta-data android:name="icon.sdf.list" android:resource="@array/icon_sdf_list" />

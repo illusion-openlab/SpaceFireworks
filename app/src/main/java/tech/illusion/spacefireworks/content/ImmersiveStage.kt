@@ -1,5 +1,9 @@
 package tech.illusion.spacefireworks.content
 
+import android.app.Activity
+import android.content.Context
+import android.content.ContextWrapper
+import android.content.pm.PackageManager
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
@@ -8,9 +12,14 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.rememberUpdatedState
+import androidx.compose.runtime.setValue
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
@@ -130,6 +139,15 @@ private val PINCH_INDICATOR_IDLE_COLOR = Color4(0.75f, 0.75f, 0.75f, 1f)
 private val PINCH_INDICATOR_ACTIVE_COLOR = Color4(0.34f, 0.88f, 0.63f, 1f)
 
 private const val HAND_LOG_TAG = "FireworkHand"
+private const val HAND_TRACKING_PERMISSION = "com.picovr.permission.HAND_TRACKING"
+private const val HAND_TRACKING_PERMISSION_REQUEST_CODE = 1001
+
+private tailrec fun Context.findActivity(): Activity? =
+    when (this) {
+        is Activity -> this
+        is ContextWrapper -> baseContext.findActivity()
+        else -> null
+    }
 
 /**
  * `stage` (contract 1): the immersive show, opened from the window's 「沉浸」 button.
@@ -386,20 +404,60 @@ private fun HandGestureController(
     onRightDoublePinch: () -> Unit,
     onLeftDoublePinch: () -> Unit,
 ) {
+    val context = LocalContext.current
     val provider = remember { HandTrackingProvider() }
     val rightAction = rememberUpdatedState(onRightDoublePinch)
     val leftAction = rememberUpdatedState(onLeftDoublePinch)
-
-    DisposableEffect(provider) {
-        val result = provider.start()
-        android.util.Log.i(
-            HAND_LOG_TAG,
-            "start() -> $result, supportState=${provider.supportState}, state=${provider.state}",
+    var hasHandTrackingPermission by remember {
+        mutableStateOf(
+            ContextCompat.checkSelfPermission(context, HAND_TRACKING_PERMISSION) ==
+                PackageManager.PERMISSION_GRANTED
         )
-        onDispose { provider.stop() }
     }
 
-    LaunchedEffect(provider) {
+    LaunchedEffect(Unit) {
+        if (!hasHandTrackingPermission) {
+            context.findActivity()?.let { activity ->
+                ActivityCompat.requestPermissions(
+                    activity,
+                    arrayOf(HAND_TRACKING_PERMISSION),
+                    HAND_TRACKING_PERMISSION_REQUEST_CODE,
+                )
+            }
+        }
+    }
+
+    DisposableEffect(provider, hasHandTrackingPermission) {
+        var started = false
+        if (hasHandTrackingPermission) {
+            val result = provider.start()
+            started = true
+            android.util.Log.i(
+                HAND_LOG_TAG,
+                "start() -> $result, supportState=${provider.supportState}, state=${provider.state}",
+            )
+        }
+        onDispose {
+            if (started) {
+                provider.stop()
+            }
+        }
+    }
+
+    LaunchedEffect(provider, hasHandTrackingPermission) {
+        if (!hasHandTrackingPermission) {
+            while (isActive && !hasHandTrackingPermission) {
+                delay(250L)
+                if (
+                    ContextCompat.checkSelfPermission(context, HAND_TRACKING_PERMISSION) ==
+                        PackageManager.PERMISSION_GRANTED
+                ) {
+                    hasHandTrackingPermission = true
+                }
+            }
+            return@LaunchedEffect
+        }
+
         // Support/state take a moment to negotiate; log again so logcat shows whether this ever
         // leaves PENDING / WITHOUT_PERMISSION / DEVICE_NOT_SUPPORTED.
         delay(2000)

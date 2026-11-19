@@ -19,6 +19,6 @@ class ExampleInstrumentedTest {
     fun useAppContext() {
         // Context of the app under test.
         val appContext = InstrumentationRegistry.getInstrumentation().targetContext
-        assertEquals("tech.illusion.spacefireworks", appContext.packageName)
+        assertEquals("tech.illusion.spacefireworks.vibelab", appContext.packageName)
     }
 }
